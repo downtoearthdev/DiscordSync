@@ -1,0 +1,18 @@
+token: ""
+mc-room-name: ""
+custom-status: "{watching} Doing chores for {players} players!"
+maintenance-status: "{playing} Maintenance Simulator 2019"
+enable_join_leave_messages: true
+enable_death_messages: true
+disable_mention_all: true
+global_message_username: "Server"
+minecraft_message_format: '<{user}> {message}'
+server-start-message: "Server started."
+helpop-room: ""
+relay-prefix: "[&9Discord&f]"
+enable_kickban_messages: true
+avatar-player-joined: ""
+avatar-player-left: ""
+avatar-player-died: ""
+avatar-player-kickbanned: ""
+mod-role: "Moderator"

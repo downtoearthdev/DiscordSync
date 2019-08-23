@@ -1,0 +1,5 @@
+name: DiscordSync
+main: com.scorchedcode.wolfplzz.DiscordSync.DiscordSync
+version: 1.0
+authors: [Darklust]
+depend: [WolfplzzFixes]
