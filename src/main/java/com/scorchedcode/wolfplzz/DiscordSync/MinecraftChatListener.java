@@ -10,6 +10,7 @@ import com.scorchedcode.wolfplzz.Fixes.events.MaintenanceEvent;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Message;
+import net.ess3.api.events.AfkStatusChangeEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -120,7 +121,26 @@ public class MinecraftChatListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerKickOrBan(PlayerKickEvent e) {
         if(DiscordSync.init.getConfig().getBoolean("enable_kickban_messages")) {
-            sendEmbed(e);
+            if(!e.getReason().contains("restarting"))
+                sendEmbed(e);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPlayerAfk(AfkStatusChangeEvent e) {
+        if(DiscordSync.init.getConfig().getBoolean("enable_afk_messages", true)) {
+            String avatarURL = "https://gamepedia.cursecdn.com/minecraft_gamepedia/4/44/Grass_Block_Revision_6.png";
+            if (DiscordSync.init.getConfig().getString("avatar-player-afk", null) != null && !DiscordSync.init.getConfig().getString("avatar-player-afk").isEmpty())
+                avatarURL = DiscordSync.init.getConfig().getString("avatar-player-afk");
+            WebhookClient client = new WebhookClientBuilder(DiscordSync.hook.getUrl()).build();
+            WebhookMessageBuilder msg = new WebhookMessageBuilder();
+            WebhookEmbedBuilder web = new WebhookEmbedBuilder();
+            web.setTitle(new WebhookEmbed.EmbedTitle(e.getAffected().getName() + (e.getValue() ? " is now AFK" : "is no longer AFK"), null));
+            web.setColor(Color.BLACK.getRGB());
+            msg.setAvatarUrl(avatarURL);
+            msg.setUsername(DiscordSync.init.getConfig().getString("global_message_username", "Server"));
+            msg.addEmbeds(web.build());
+            client.send(msg.build());
         }
     }
 

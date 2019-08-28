@@ -16,3 +16,5 @@ avatar-player-left: ""
 avatar-player-died: ""
 avatar-player-kickbanned: ""
 mod-role: "Moderator"
+enable_afk_messages: true
+avatar-player-afk: ""
