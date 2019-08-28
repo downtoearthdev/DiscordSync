@@ -4,14 +4,14 @@ import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.send.WebhookEmbed;
 import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
-import club.minnced.discord.webhook.send.WebhookMessage;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import com.scorchedcode.wolfplzz.Casino.Blackjack;
-import net.dv8tion.jda.api.entities.Webhook;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.*;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -30,23 +30,23 @@ public class DiscordListener extends ListenerAdapter {
         if(event.getChannel().equals(DiscordSync.channel)) {
             if(!event.getAuthor().getName().equals(event.getJDA().getSelfUser().getName()) && event.getMessage().getContentRaw().indexOf("!") != 0) {
                 TextComponent msg = new TextComponent();
-                TextComponent prefix = new TextComponent(ChatColor.translateAlternateColorCodes('&', DiscordSync.init.getConfig().getString("relay-prefix", "[&9Discord&f]")));
+                TextComponent prefix = new TextComponent(ChatColor.translateAlternateColorCodes('&', Settings.RELAY_PREFIX));
                 if(!event.isWebhookMessage())
-                    msg.setText(ChatColor.translateAlternateColorCodes('&', DiscordSync.init.getConfig().getString("minecraft_message_format", ChatColor.RESET + "<{user}> {message}").replaceAll("\\{user}", event.getMember().getEffectiveName()).replaceAll("\\{message}", event.getMessage().getContentRaw())));
+                    msg.setText(ChatColor.translateAlternateColorCodes('&', Settings.MINECRAFT_MESSAGE_FORMAT.replaceAll("\\{user}", event.getMember().getEffectiveName()).replaceAll("\\{message}", event.getMessage().getContentRaw())));
                 else {
-                    if(!event.getAuthor().getName().contains("Blackjack") && !event.getAuthor().getName().equals(DiscordSync.init.getConfig().getString("global_message_username")) && Bukkit.getPlayer(event.getAuthor().getName()) == null)
-                        msg.setText(ChatColor.translateAlternateColorCodes('&', DiscordSync.init.getConfig().getString("minecraft_message_format", ChatColor.RESET + "<{user}> {message}").replaceAll("\\{user}", event.getAuthor().getName()).replaceAll("\\{message}", event.getMessage().getContentRaw())));
+                    if(!event.getAuthor().getName().contains("Blackjack") && !event.getAuthor().getName().equals(Settings.GLOBAL_MESSAGE_USERNAME) && Bukkit.getPlayer(event.getAuthor().getName()) == null)
+                        msg.setText(ChatColor.translateAlternateColorCodes('&', Settings.MINECRAFT_MESSAGE_FORMAT.replaceAll("\\{user}", event.getAuthor().getName()).replaceAll("\\{message}", event.getMessage().getContentRaw())));
                     else
                         return;
                 }
                 prefix.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, DiscordSync.inviteURL));
                 prefix.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new BaseComponent[]{new TextComponent("Join Discord!")}));;
-                for(Player p : DiscordSync.init.getServer().getOnlinePlayers())
+                for(Player p : DiscordSync.getInstance().getServer().getOnlinePlayers())
                     p.spigot().sendMessage(prefix, msg);
-                //DiscordSync.init.getServer().broadcastMessage(ChatColor.translateAlternateColorCodes('&', DiscordSync.init.getConfig().getString("minecraft_message_format", ChatColor.DARK_BLUE + "[Discord] " + ChatColor.RESET + "<{user}> {message}").replaceAll("\\{user}", event.getMember().getEffectiveName()).replaceAll("\\{message}", event.getMessage().getContentRaw())));
+                //DiscordSync.getInstance().getServer().broadcastMessage(ChatColor.translateAlternateColorCodes('&', DiscordSync.getInstance().getConfig().getString("minecraft_message_format", ChatColor.DARK_BLUE + "[Discord] " + ChatColor.RESET + "<{user}> {message}").replaceAll("\\{user}", event.getMember().getEffectiveName()).replaceAll("\\{message}", event.getMessage().getContentRaw())));
             }
         }
-        if(event.getMessage().getContentRaw().split(" ")[0].equalsIgnoreCase("!casinostats") && event.getMember().getRoles().contains(event.getJDA().getRolesByName(DiscordSync.init.getConfig().getString("mod-role"), true).get(0))) {
+        if(event.getMessage().getContentRaw().split(" ")[0].equalsIgnoreCase("!casinostats") && event.getMember().getRoles().contains(event.getJDA().getRolesByName(Settings.MOD_ROLE, true).get(0))) {
             if(event.getMessage().getContentRaw().split("").length > 1) {
                 String mesg = Blackjack.getStats(event.getMessage().getContentRaw().split(" ")[1]);
                 if (!mesg.isEmpty()) {
@@ -64,8 +64,8 @@ public class DiscordListener extends ListenerAdapter {
             }
         }
 
-        if(event.getMessage().getContentRaw().split(" ")[0].equalsIgnoreCase("!mcs") && event.getMember().getRoles().contains(event.getJDA().getRolesByName(DiscordSync.init.getConfig().getString("mod-role"), true).get(0))) {
-               event.getChannel().sendMessage("TPS: "  );
+        if(event.getMessage().getContentRaw().split(" ")[0].equalsIgnoreCase("!mcs") && event.getMember().getRoles().contains(event.getJDA().getRolesByName(Settings.MOD_ROLE, true).get(0))) {
+               //event.getChannel().sendMessage("TPS: " + DiscordSync.getInstance().getServer(). );
         }
     }
 }

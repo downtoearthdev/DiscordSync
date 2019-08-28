@@ -5,10 +5,7 @@ import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.send.WebhookEmbed;
 import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
-import com.scorchedcode.wolfplzz.Fixes.WolfplzzFixes;
 import com.scorchedcode.wolfplzz.Fixes.events.MaintenanceEvent;
-import net.dv8tion.jda.api.OnlineStatus;
-import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Message;
 import net.ess3.api.events.AfkStatusChangeEvent;
 import org.bukkit.ChatColor;
@@ -35,7 +32,7 @@ public class MinecraftChatListener implements Listener {
                     pins.delete().complete();
                 }
             }
-            DiscordSync.init.setStatus();
+            DiscordSync.getInstance().setStatus();
             Message msg = DiscordSync.channel.sendMessage("Server maintenance is occurring.").complete();
             msg.pin().complete();
         }
@@ -48,25 +45,25 @@ public class MinecraftChatListener implements Listener {
                     pins.delete().complete();
                 }
             }
-            DiscordSync.init.setStatus();
+            DiscordSync.getInstance().setStatus();
         }
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onServerStart(ServerLoadEvent e) {
-        if(DiscordSync.init.getConfig().getString("server-start-message", null) != null && !DiscordSync.init.getConfig().getString("server-start-message").isEmpty()) {
+        if(Settings.SERVER_START_MESSAGE != null && !Settings.SERVER_START_MESSAGE.isEmpty()) {
             List<Message> msgs = DiscordSync.channel.getIterableHistory().complete();
             if(msgs.get(0).getEmbeds().size() > 0) {
-                if (msgs.get(0).getEmbeds().get(0).getTitle().contains(DiscordSync.init.getConfig().getString("server-start-message")))
+                if (msgs.get(0).getEmbeds().get(0).getTitle().contains(Settings.SERVER_START_MESSAGE))
                     msgs.get(0).delete().queue();
             }
             WebhookClient client = new WebhookClientBuilder(DiscordSync.hook.getUrl()).build();
             WebhookMessageBuilder msg = new WebhookMessageBuilder();
             WebhookEmbedBuilder web = new WebhookEmbedBuilder();
-            web.setTitle(new WebhookEmbed.EmbedTitle(DiscordSync.init.getConfig().getString("server-start-message"), null));
+            web.setTitle(new WebhookEmbed.EmbedTitle(Settings.SERVER_START_MESSAGE, null));
             web.setColor(Color.DARK_GRAY.getRGB());
             msg.setAvatarUrl("https://gamepedia.cursecdn.com/minecraft_gamepedia/4/44/Grass_Block_Revision_6.png");
-            msg.setUsername(DiscordSync.init.getConfig().getString("global_message_username", "Server"));
+            msg.setUsername(Settings.GLOBAL_MESSAGE_USERNAME);
             msg.addEmbeds(web.build());
             client.send(msg.build());
         }
@@ -83,7 +80,7 @@ public class MinecraftChatListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerChatEvent(AsyncPlayerChatEvent e) {
-        if(DiscordSync.init.getConfig().getBoolean("disable_mention_all", false) && (e.getMessage().contains("@here") || e.getMessage().contains("@everyone"))) {
+        if(Settings.DISABLE_MENTiON_ALL && (e.getMessage().contains("@here") || e.getMessage().contains("@everyone"))) {
             e.getPlayer().sendMessage(ChatColor.RED + "You are not allowed to mention all users.");
             e.setCancelled(true);
             return;
@@ -98,29 +95,29 @@ public class MinecraftChatListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerJoin(PlayerJoinEvent e) {
-        if(DiscordSync.init.getConfig().getBoolean("enable_join_leave_messages", true))
+        if(Settings.ENABLE_JOIN_LEAVE_MESSAGES)
             sendEmbed(e);
-        DiscordSync.init.setStatus();
+        DiscordSync.getInstance().setStatus();
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerLeave(PlayerQuitEvent e) {
-        if(DiscordSync.init.getConfig().getBoolean("enable_join_leave_messages", true))
+        if(Settings.ENABLE_JOIN_LEAVE_MESSAGES)
             sendEmbed(e);
-        DiscordSync.init.getServer().getScheduler().scheduleAsyncDelayedTask(DiscordSync.init, () -> {
-           DiscordSync.init.setStatus();
+        DiscordSync.getInstance().getServer().getScheduler().scheduleAsyncDelayedTask(DiscordSync.getInstance(), () -> {
+           DiscordSync.getInstance().setStatus();
         }, 60L);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerDeath(PlayerDeathEvent e) {
-        if(DiscordSync.init.getConfig().getBoolean("enable_death_messages", true))
+        if(Settings.ENABLE_DEATH_MESSAGES)
             sendDeathEmbed(e);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerKickOrBan(PlayerKickEvent e) {
-        if(DiscordSync.init.getConfig().getBoolean("enable_kickban_messages")) {
+        if(Settings.ENABLE_KICKBAN_MESSAGES) {
             if(!e.getReason().contains("restarting"))
                 sendEmbed(e);
         }
@@ -128,17 +125,17 @@ public class MinecraftChatListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerAfk(AfkStatusChangeEvent e) {
-        if(DiscordSync.init.getConfig().getBoolean("enable_afk_messages", true)) {
+        if(Settings.ENABLE_AFK_MESSAGES) {
             String avatarURL = "https://gamepedia.cursecdn.com/minecraft_gamepedia/4/44/Grass_Block_Revision_6.png";
-            if (DiscordSync.init.getConfig().getString("avatar-player-afk", null) != null && !DiscordSync.init.getConfig().getString("avatar-player-afk").isEmpty())
-                avatarURL = DiscordSync.init.getConfig().getString("avatar-player-afk");
+            if (Settings.AVATAR_PLAYER_AFK != null && !Settings.AVATAR_PLAYER_AFK.isEmpty())
+                avatarURL = Settings.AVATAR_PLAYER_AFK;
             WebhookClient client = new WebhookClientBuilder(DiscordSync.hook.getUrl()).build();
             WebhookMessageBuilder msg = new WebhookMessageBuilder();
             WebhookEmbedBuilder web = new WebhookEmbedBuilder();
             web.setTitle(new WebhookEmbed.EmbedTitle(e.getAffected().getName() + (e.getValue() ? " is now AFK" : "is no longer AFK"), null));
             web.setColor(Color.BLACK.getRGB());
             msg.setAvatarUrl(avatarURL);
-            msg.setUsername(DiscordSync.init.getConfig().getString("global_message_username", "Server"));
+            msg.setUsername(Settings.GLOBAL_MESSAGE_USERNAME);
             msg.addEmbeds(web.build());
             client.send(msg.build());
         }
@@ -146,12 +143,12 @@ public class MinecraftChatListener implements Listener {
 
     private void sendEmbed(PlayerEvent e) {
         String avatarURL = "https://gamepedia.cursecdn.com/minecraft_gamepedia/4/44/Grass_Block_Revision_6.png";
-        if(e instanceof PlayerJoinEvent && DiscordSync.init.getConfig().getString("avatar-player-died", null) != null && !DiscordSync.init.getConfig().getString("avatar-player-joined").isEmpty())
-            avatarURL = DiscordSync.init.getConfig().getString("avatar-player-joined");
-        else if(e instanceof PlayerQuitEvent && DiscordSync.init.getConfig().getString("avatar-player-left", null) != null && !DiscordSync.init.getConfig().getString("avatar-player-left").isEmpty())
-            avatarURL = DiscordSync.init.getConfig().getString("avatar-player-left");
-        else if(e instanceof PlayerKickEvent && DiscordSync.init.getConfig().getString("avatar-player-kickbanned", null) != null && !DiscordSync.init.getConfig().getString("avatar-player-kickbanned").isEmpty())
-            avatarURL = DiscordSync.init.getConfig().getString("avatar-player-kickbanned");
+        if(e instanceof PlayerJoinEvent && Settings.AVATAR_PLAYER_JOINED != null && !Settings.AVATAR_PLAYER_JOINED.isEmpty())
+            avatarURL = Settings.AVATAR_PLAYER_JOINED;
+        else if(e instanceof PlayerQuitEvent && Settings.AVATAR_PLAYER_LEFT != null && !Settings.AVATAR_PLAYER_LEFT.isEmpty())
+            avatarURL = Settings.AVATAR_PLAYER_LEFT;
+        else if(e instanceof PlayerKickEvent && Settings.AVATAR_PLAYER_KICKBANNED != null && !Settings.AVATAR_PLAYER_KICKBANNED.isEmpty())
+            avatarURL = Settings.AVATAR_PLAYER_KICKBANNED;
         WebhookClient client = new WebhookClientBuilder(DiscordSync.hook.getUrl()).build();
         WebhookMessageBuilder msg = new WebhookMessageBuilder();
         WebhookEmbedBuilder web = new WebhookEmbedBuilder();
@@ -164,20 +161,20 @@ public class MinecraftChatListener implements Listener {
             web.setColor(Color.MAGENTA.getRGB());
         }
         msg.setAvatarUrl(avatarURL);
-        msg.setUsername(DiscordSync.init.getConfig().getString("global_message_username", "Server"));
+        msg.setUsername(Settings.GLOBAL_MESSAGE_USERNAME);
         msg.addEmbeds(web.build());
         client.send(msg.build());
     }
 
     private void sendDeathEmbed(PlayerDeathEvent e) {
-        String avatarURL = (DiscordSync.init.getConfig().getString("avatar-player-died", null) != null && !DiscordSync.init.getConfig().getString("avatar-player-died").isEmpty() ? DiscordSync.init.getConfig().getString("avatar-player-died") : "https://www.emoji.com/wp-content/uploads/filebase/icons/emoji-icon-glossy-00-05-faces-face-fantasy-skull-and-crossbones-72dpi-forPersonalUseOnly.png");
+        String avatarURL = (Settings.AVATAR_PLAYER_DIED != null && !Settings.AVATAR_PLAYER_DIED.isEmpty() ? Settings.AVATAR_PLAYER_DIED : "https://www.emoji.com/wp-content/uploads/filebase/icons/emoji-icon-glossy-00-05-faces-face-fantasy-skull-and-crossbones-72dpi-forPersonalUseOnly.png");
         WebhookClient client = new WebhookClientBuilder(DiscordSync.hook.getUrl()).build();
         WebhookMessageBuilder msg = new WebhookMessageBuilder();
         WebhookEmbedBuilder web = new WebhookEmbedBuilder();
         web.setTitle(new WebhookEmbed.EmbedTitle(e.getDeathMessage(), null));
         web.setColor(Color.DARK_GRAY.getRGB());
         msg.setAvatarUrl(avatarURL);
-        msg.setUsername(DiscordSync.init.getConfig().getString("global_message_username", "Server"));
+        msg.setUsername(Settings.GLOBAL_MESSAGE_USERNAME);
         msg.addEmbeds(web.build());
         client.send(msg.build());
 
