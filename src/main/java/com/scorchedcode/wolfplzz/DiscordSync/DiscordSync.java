@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.managers.Presence;
 import net.dv8tion.jda.api.managers.WebhookManager;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.security.auth.login.LoginException;
@@ -66,6 +67,7 @@ public class DiscordSync extends JavaPlugin {
         }
         if(inviteURL.isEmpty())
             inviteURL = ((TextChannel) channel).createInvite().setMaxAge(0).complete().getUrl();
+        ((TextChannel)channel).getManager().setTopic("Minecraft server version " + Bukkit.getBukkitVersion().replaceAll("-.+", "") + " & ip: " + Bukkit.getIp() + " , Dynmap: ").complete();
 
     }
 
@@ -96,4 +98,5 @@ public class DiscordSync extends JavaPlugin {
         api.getPresence().setPresence((WolfplzzFixes.MAINTENANCE_MODE) ? OnlineStatus.DO_NOT_DISTURB : OnlineStatus.ONLINE,
                 (WolfplzzFixes.MAINTENANCE_MODE) ? maint : stat);
     }
+
 }

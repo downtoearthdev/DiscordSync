@@ -46,7 +46,7 @@ public class DiscordListener extends ListenerAdapter {
                 //DiscordSync.init.getServer().broadcastMessage(ChatColor.translateAlternateColorCodes('&', DiscordSync.init.getConfig().getString("minecraft_message_format", ChatColor.DARK_BLUE + "[Discord] " + ChatColor.RESET + "<{user}> {message}").replaceAll("\\{user}", event.getMember().getEffectiveName()).replaceAll("\\{message}", event.getMessage().getContentRaw())));
             }
         }
-        if(event.getMessage().getContentRaw().contains("!casinostats") && event.getMember().getRoles().contains(event.getJDA().getRolesByName(DiscordSync.init.getConfig().getString("mod-role"), true).get(0))) {
+        if(event.getMessage().getContentRaw().split(" ")[0].equalsIgnoreCase("!casinostats") && event.getMember().getRoles().contains(event.getJDA().getRolesByName(DiscordSync.init.getConfig().getString("mod-role"), true).get(0))) {
             if(event.getMessage().getContentRaw().split("").length > 1) {
                 String mesg = Blackjack.getStats(event.getMessage().getContentRaw().split(" ")[1]);
                 if (!mesg.isEmpty()) {
@@ -62,6 +62,10 @@ public class DiscordListener extends ListenerAdapter {
                     client.send(msg.build());
                 }
             }
+        }
+
+        if(event.getMessage().getContentRaw().split(" ")[0].equalsIgnoreCase("!mcs") && event.getMember().getRoles().contains(event.getJDA().getRolesByName(DiscordSync.init.getConfig().getString("mod-role"), true).get(0))) {
+               event.getChannel().sendMessage("TPS: "  );
         }
     }
 }
