@@ -1,11 +1,10 @@
-package com.scorchedcode.wolfplzz.DiscordSync;
+package com.scorchedcode.DiscordSync;
 
 import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.send.WebhookEmbed;
 import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
-import com.scorchedcode.wolfplzz.Fixes.events.MaintenanceEvent;
 import net.dv8tion.jda.api.entities.Message;
 import net.ess3.api.events.AfkStatusChangeEvent;
 import org.bukkit.ChatColor;
@@ -21,33 +20,6 @@ import java.util.List;
 
 public class MinecraftChatListener implements Listener {
 
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onMaintenanceEvent(MaintenanceEvent e) {
-        if(e.isMaintenanceEnabled()) {
-            for(Message pins : DiscordSync.channel.retrievePinnedMessages().complete()) {
-                if(pins.getContentRaw().contains("Server maintenance")) {
-                    List<Message> msgs = DiscordSync.channel.getIterableHistory().complete();
-                    msgs.get(msgs.indexOf(pins)-1).delete().complete();
-                    pins.unpin().complete();
-                    pins.delete().complete();
-                }
-            }
-            DiscordSync.getInstance().setStatus();
-            Message msg = DiscordSync.channel.sendMessage("Server maintenance is occurring.").complete();
-            msg.pin().complete();
-        }
-        else {
-            for(Message pins : DiscordSync.channel.retrievePinnedMessages().complete()) {
-                if(pins.getContentRaw().contains("Server maintenance")) {
-                    List<Message> msgs = DiscordSync.channel.getIterableHistory().complete();
-                    msgs.get(msgs.indexOf(pins)-1).delete().complete();
-                    pins.unpin().complete();
-                    pins.delete().complete();
-                }
-            }
-            DiscordSync.getInstance().setStatus();
-        }
-    }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onServerStart(ServerLoadEvent e) {
@@ -62,7 +34,7 @@ public class MinecraftChatListener implements Listener {
             WebhookEmbedBuilder web = new WebhookEmbedBuilder();
             web.setTitle(new WebhookEmbed.EmbedTitle(Settings.SERVER_START_MESSAGE, null));
             web.setColor(Color.DARK_GRAY.getRGB());
-            msg.setAvatarUrl("https://gamepedia.cursecdn.com/minecraft_gamepedia/4/44/Grass_Block_Revision_6.png");
+            msg.setAvatarUrl("https://gamepedia.cursecdn.com/minecraft_gamepedia/6/6a/Grass_Block_JE6_BE5.png?version=1d18984aec2dbdffa415ccc0c787fa74");
             msg.setUsername(Settings.GLOBAL_MESSAGE_USERNAME);
             msg.addEmbeds(web.build());
             client.send(msg.build());
@@ -126,7 +98,7 @@ public class MinecraftChatListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerAfk(AfkStatusChangeEvent e) {
         if(Settings.ENABLE_AFK_MESSAGES) {
-            String avatarURL = "https://gamepedia.cursecdn.com/minecraft_gamepedia/4/44/Grass_Block_Revision_6.png";
+            String avatarURL = "https://gamepedia.cursecdn.com/minecraft_gamepedia/6/6a/Grass_Block_JE6_BE5.png?version=1d18984aec2dbdffa415ccc0c787fa74\"";
             if (Settings.AVATAR_PLAYER_AFK != null && !Settings.AVATAR_PLAYER_AFK.isEmpty())
                 avatarURL = Settings.AVATAR_PLAYER_AFK;
             WebhookClient client = new WebhookClientBuilder(DiscordSync.hook.getUrl()).build();
@@ -142,7 +114,7 @@ public class MinecraftChatListener implements Listener {
     }
 
     private void sendEmbed(PlayerEvent e) {
-        String avatarURL = "https://gamepedia.cursecdn.com/minecraft_gamepedia/4/44/Grass_Block_Revision_6.png";
+        String avatarURL = "https://gamepedia.cursecdn.com/minecraft_gamepedia/6/6a/Grass_Block_JE6_BE5.png?version=1d18984aec2dbdffa415ccc0c787fa74";
         if(e instanceof PlayerJoinEvent && Settings.AVATAR_PLAYER_JOINED != null && !Settings.AVATAR_PLAYER_JOINED.isEmpty())
             avatarURL = Settings.AVATAR_PLAYER_JOINED;
         else if(e instanceof PlayerQuitEvent && Settings.AVATAR_PLAYER_LEFT != null && !Settings.AVATAR_PLAYER_LEFT.isEmpty())

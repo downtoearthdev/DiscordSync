@@ -1,23 +1,19 @@
-package com.scorchedcode.wolfplzz.DiscordSync;
+package com.scorchedcode.DiscordSync;
 
 import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.send.WebhookEmbed;
 import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
-import com.scorchedcode.wolfplzz.Fixes.WolfplzzFixes;
 import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.*;
-import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.mineacademy.fo.Common;
-import org.mineacademy.fo.MinecraftVersion;
 import org.mineacademy.fo.plugin.SimplePlugin;
 import org.mineacademy.fo.settings.YamlStaticConfig;
 
@@ -90,7 +86,7 @@ public class DiscordSync extends SimplePlugin {
         }
         if(inviteURL.isEmpty())
             inviteURL = ((TextChannel) channel).createInvite().setMaxAge(0).complete().getUrl();
-        ((TextChannel)channel).getManager().setTopic("Minecraft server version " + Bukkit.getBukkitVersion().replaceAll("-.+", "") + " & ip: " + (Settings.SERVER_DOMAIN.isEmpty() ? Bukkit.getIp() : Settings.SERVER_DOMAIN) + (WolfplzzFixes.DYNMAP_LINK != null ? " , Dynmap: " + WolfplzzFixes.DYNMAP_LINK : "")).complete();
+        //((TextChannel)channel).getManager().setTopic("Minecraft server version " + Bukkit.getBukkitVersion().replaceAll("-.+", "") + " & ip: " + (Settings.SERVER_DOMAIN.isEmpty() ? Bukkit.getIp() : Settings.SERVER_DOMAIN) + (WolfplzzFixes.DYNMAP_LINK != null ? " , Dynmap: " + WolfplzzFixes.DYNMAP_LINK : "")).complete();
 
 
     }
@@ -108,16 +104,11 @@ public class DiscordSync extends SimplePlugin {
     }
 
     public void setStatus() {
-        String maintRev = Settings.MAINTENANCE_STATUS.replaceAll("\\{players}", String.valueOf(DiscordSync.getInstance().getServer().getOnlinePlayers().size()));
         String statusRev = Settings.CUSTOM_STATUS.replaceAll("\\{players}", String.valueOf(DiscordSync.getInstance().getServer().getOnlinePlayers().size()));
         Activity stat = (Settings.CUSTOM_STATUS.contains("{playing}")) ? Activity.playing(statusRev.replaceAll("\\{playing}", "")) :
                 (Settings.CUSTOM_STATUS.contains("{listening}")) ? Activity.listening(statusRev.replaceAll("\\{listening}", "")) :
                 Activity.watching(statusRev.replaceAll("\\{watching}", ""));
-        Activity maint = (Settings.MAINTENANCE_STATUS.contains("{playing}")) ? Activity.playing(maintRev.replaceAll("\\{playing}", "")) :
-                (Settings.MAINTENANCE_STATUS.contains("{listening}")) ? Activity.listening(maintRev.replaceAll("\\{listening}", "")) :
-                Activity.watching(maintRev.replaceAll("\\{watching}", ""));
-        api.getPresence().setPresence((WolfplzzFixes.MAINTENANCE_MODE) ? OnlineStatus.DO_NOT_DISTURB : OnlineStatus.ONLINE,
-                (WolfplzzFixes.MAINTENANCE_MODE) ? maint : stat);
+        api.getPresence().setPresence(OnlineStatus.ONLINE, stat);
     }
 
     @Override

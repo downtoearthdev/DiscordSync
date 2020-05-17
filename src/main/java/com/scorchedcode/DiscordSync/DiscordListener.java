@@ -1,11 +1,5 @@
-package com.scorchedcode.wolfplzz.DiscordSync;
+package com.scorchedcode.DiscordSync;
 
-import club.minnced.discord.webhook.WebhookClient;
-import club.minnced.discord.webhook.WebhookClientBuilder;
-import club.minnced.discord.webhook.send.WebhookEmbed;
-import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
-import club.minnced.discord.webhook.send.WebhookMessageBuilder;
-import com.scorchedcode.wolfplzz.Casino.Blackjack;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -17,12 +11,10 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.mineacademy.fo.Common;
-import org.mineacademy.fo.collection.expiringmap.ExpiringMap;
 import org.mineacademy.fo.model.HookManager;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
-import java.util.regex.Pattern;
 
 public class DiscordListener extends ListenerAdapter {
 
@@ -63,7 +55,7 @@ public class DiscordListener extends ListenerAdapter {
                 //DiscordSync.getInstance().getServer().broadcastMessage(ChatColor.translateAlternateColorCodes('&', DiscordSync.getInstance().getConfig().getString("minecraft_message_format", ChatColor.DARK_BLUE + "[Discord] " + ChatColor.RESET + "<{user}> {message}").replaceAll("\\{user}", event.getMember().getEffectiveName()).replaceAll("\\{message}", event.getMessage().getContentRaw())));
             }
         }
-        if(event.getMessage().getContentRaw().split(" ")[0].equalsIgnoreCase("!casinostats") && event.getMember().getRoles().contains(event.getJDA().getRolesByName(Settings.MOD_ROLE, true).get(0))) {
+        /*if(event.getMessage().getContentRaw().split(" ")[0].equalsIgnoreCase("!casinostats") && event.getMember().getRoles().contains(event.getJDA().getRolesByName(Settings.MOD_ROLE, true).get(0))) {
             if(event.getMessage().getContentRaw().split("").length > 1) {
                 String mesg = Blackjack.getStats(event.getMessage().getContentRaw().split(" ")[1]);
                 if (!mesg.isEmpty()) {
@@ -79,7 +71,7 @@ public class DiscordListener extends ListenerAdapter {
                     client.send(msg.build());
                 }
             }
-        }
+        }*/
 
         if(event.getMessage().getContentRaw().equalsIgnoreCase("!discord") ||
             event.getMessage().getContentRaw().equalsIgnoreCase("!twitch") ||

@@ -1,4 +1,4 @@
-package com.scorchedcode.wolfplzz.DiscordSync;
+package com.scorchedcode.DiscordSync;
 
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;

@@ -1,4 +1,4 @@
-package com.scorchedcode.wolfplzz.DiscordSync;
+package com.scorchedcode.DiscordSync;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
