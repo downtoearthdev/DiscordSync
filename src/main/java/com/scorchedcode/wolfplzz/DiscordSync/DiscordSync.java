@@ -1,17 +1,28 @@
 package com.scorchedcode.wolfplzz.DiscordSync;
 
+import club.minnced.discord.webhook.WebhookClient;
+import club.minnced.discord.webhook.WebhookClientBuilder;
+import club.minnced.discord.webhook.send.WebhookEmbed;
+import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
+import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import com.scorchedcode.wolfplzz.Fixes.WolfplzzFixes;
 import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.*;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.mineacademy.fo.Common;
 import org.mineacademy.fo.MinecraftVersion;
 import org.mineacademy.fo.plugin.SimplePlugin;
 import org.mineacademy.fo.settings.YamlStaticConfig;
 
 import javax.security.auth.login.LoginException;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +41,21 @@ public class DiscordSync extends SimplePlugin {
     @Override
     protected void onPluginStart() {
 
+    }
+
+    @Override
+    protected void onPluginStop() {
+        if(Settings.SERVER_RESTART_MESSAGE != null && !Settings.SERVER_RESTART_MESSAGE.isEmpty()) {
+            WebhookClient client = new WebhookClientBuilder(DiscordSync.hook.getUrl()).build();
+            WebhookMessageBuilder msg = new WebhookMessageBuilder();
+            WebhookEmbedBuilder web = new WebhookEmbedBuilder();
+            web.setTitle(new WebhookEmbed.EmbedTitle(Settings.SERVER_RESTART_MESSAGE, null));
+            web.setColor(Color.DARK_GRAY.getRGB());
+            msg.setAvatarUrl("https://gamepedia.cursecdn.com/minecraft_gamepedia/4/44/Grass_Block_Revision_6.png");
+            msg.setUsername(Settings.GLOBAL_MESSAGE_USERNAME);
+            msg.addEmbeds(web.build());
+            client.send(msg.build());
+        }
     }
 
     @Override
@@ -64,7 +90,7 @@ public class DiscordSync extends SimplePlugin {
         }
         if(inviteURL.isEmpty())
             inviteURL = ((TextChannel) channel).createInvite().setMaxAge(0).complete().getUrl();
-        ((TextChannel)channel).getManager().setTopic("Minecraft server version " + MinecraftVersion.getServerVersion().replaceAll("-.+", "") + " & ip: " + Bukkit.getIp() + " , Dynmap: ").complete();
+        ((TextChannel)channel).getManager().setTopic("Minecraft server version " + Bukkit.getBukkitVersion().replaceAll("-.+", "") + " & ip: " + (Settings.SERVER_DOMAIN.isEmpty() ? Bukkit.getIp() : Settings.SERVER_DOMAIN) + (WolfplzzFixes.DYNMAP_LINK != null ? " , Dynmap: " + WolfplzzFixes.DYNMAP_LINK : "")).complete();
 
 
     }
@@ -99,6 +125,18 @@ public class DiscordSync extends SimplePlugin {
         List<Class<? extends YamlStaticConfig>> settings = new ArrayList<>();
         settings.add(Settings.class);
         return settings;
+    }
+
+    public static class API {
+
+        public static void broadcast(TextComponent... args) {
+            ArrayList<String> texts = new ArrayList<>();
+            for(TextComponent text : args)
+                texts.add((text.getClickEvent() != null) ? DarkUtil.getURL(text.getClickEvent().getValue()) : text.getText());
+            channel.sendMessage(ChatColor.stripColor(Common.joinToString(texts).replaceAll("[\\[\\],]", ""))).complete();
+            for(Player p : getInstance().getServer().getOnlinePlayers())
+                p.spigot().sendMessage(args);
+        }
     }
 
 }

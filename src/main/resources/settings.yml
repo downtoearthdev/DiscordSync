@@ -8,6 +8,7 @@ disable_mention_all: true
 global_message_username: "Server"
 minecraft_message_format: '<{user}> {message}'
 server-start-message: "Server started."
+server-restart-message: "Server restarting!"
 helpop-room: ""
 relay-prefix: "[&9Discord&f]"
 enable_kickban_messages: true
@@ -18,4 +19,5 @@ avatar-player-kickbanned: ""
 mod-role: "Moderator"
 enable_afk_messages: true
 avatar-player-afk: ""
-Version: 1
+server-domain: ""
+Version: 2

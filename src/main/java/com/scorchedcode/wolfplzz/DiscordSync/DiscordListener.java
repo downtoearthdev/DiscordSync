@@ -6,6 +6,7 @@ import club.minnced.discord.webhook.send.WebhookEmbed;
 import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import com.scorchedcode.wolfplzz.Casino.Blackjack;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.md_5.bungee.api.ChatColor;
@@ -15,9 +16,13 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.mineacademy.fo.Common;
+import org.mineacademy.fo.collection.expiringmap.ExpiringMap;
+import org.mineacademy.fo.model.HookManager;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
+import java.util.regex.Pattern;
 
 public class DiscordListener extends ListenerAdapter {
 
@@ -30,11 +35,23 @@ public class DiscordListener extends ListenerAdapter {
         if(event.getChannel().equals(DiscordSync.channel)) {
             if(!event.getAuthor().getName().equals(event.getJDA().getSelfUser().getName()) && event.getMessage().getContentRaw().indexOf("!") != 0) {
                 TextComponent msg = new TextComponent();
+                TextComponent msgtwo = new TextComponent();
+                TextComponent url = new TextComponent();
                 TextComponent prefix = new TextComponent(ChatColor.translateAlternateColorCodes('&', Settings.RELAY_PREFIX));
-                if(!event.isWebhookMessage())
+                if(!event.isWebhookMessage()) {
                     msg.setText(ChatColor.translateAlternateColorCodes('&', Settings.MINECRAFT_MESSAGE_FORMAT.replaceAll("\\{user}", event.getMember().getEffectiveName()).replaceAll("\\{message}", event.getMessage().getContentRaw())));
+                    //Make links clickable
+                    if(DarkUtil.getURL(event.getMessage().getContentRaw()) != null) {
+                        String furl = DarkUtil.getURL(event.getMessage().getContentRaw());
+                        String[] split = msg.getText().split(furl);
+                        msg.setText(split[0]);
+                        msgtwo.setText((split.length > 1) ? split[1] : "");
+                        url.setText(furl);
+                        url.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, furl));
+                    }
+                }
                 else {
-                    if(!event.getAuthor().getName().contains("Blackjack") && !event.getAuthor().getName().equals(Settings.GLOBAL_MESSAGE_USERNAME) && Bukkit.getPlayer(event.getAuthor().getName()) == null)
+                    if(!event.getAuthor().getName().contains("Blackjack") && event.getMessage().getEmbeds().size() == 0 && !event.getAuthor().getName().equals(Settings.GLOBAL_MESSAGE_USERNAME) && Bukkit.getPlayer(event.getAuthor().getName()) == null)
                         msg.setText(ChatColor.translateAlternateColorCodes('&', Settings.MINECRAFT_MESSAGE_FORMAT.replaceAll("\\{user}", event.getAuthor().getName()).replaceAll("\\{message}", event.getMessage().getContentRaw())));
                     else
                         return;
@@ -42,7 +59,7 @@ public class DiscordListener extends ListenerAdapter {
                 prefix.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, DiscordSync.inviteURL));
                 prefix.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new BaseComponent[]{new TextComponent("Join Discord!")}));;
                 for(Player p : DiscordSync.getInstance().getServer().getOnlinePlayers())
-                    p.spigot().sendMessage(prefix, msg);
+                    p.spigot().sendMessage(prefix, msg, url, msgtwo);
                 //DiscordSync.getInstance().getServer().broadcastMessage(ChatColor.translateAlternateColorCodes('&', DiscordSync.getInstance().getConfig().getString("minecraft_message_format", ChatColor.DARK_BLUE + "[Discord] " + ChatColor.RESET + "<{user}> {message}").replaceAll("\\{user}", event.getMember().getEffectiveName()).replaceAll("\\{message}", event.getMessage().getContentRaw())));
             }
         }
@@ -61,6 +78,23 @@ public class DiscordListener extends ListenerAdapter {
                     msg.addEmbeds(web.build());
                     client.send(msg.build());
                 }
+            }
+        }
+
+        if(event.getMessage().getContentRaw().equalsIgnoreCase("!discord") ||
+            event.getMessage().getContentRaw().equalsIgnoreCase("!twitch") ||
+            event.getMessage().getContentRaw().equalsIgnoreCase("!website") ||
+            event.getMessage().getContentRaw().equalsIgnoreCase("!youtube") ||
+            event.getMessage().getContentRaw().equalsIgnoreCase("!teamspeak") ||
+            event.getMessage().getContentRaw().equalsIgnoreCase("!map"))
+                Common.dispatchCommand(Bukkit.getConsoleSender(), event.getMessage().getContentRaw().replaceAll("!", ""));
+
+        if(event.getMessage().getContentRaw().equalsIgnoreCase("!playerlist")) {
+            for(Player p : Bukkit.getOnlinePlayers()) {
+                EmbedBuilder builder = new EmbedBuilder();
+                builder.setAuthor(p.getName(), "https://crafatar.com/avatars/" + p.getUniqueId().toString())
+                .setColor((HookManager.isAfk(p)) ? Color.DARK_GRAY : Color.GREEN);
+                event.getChannel().sendMessage(builder.build()).complete();
             }
         }
 

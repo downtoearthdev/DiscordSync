@@ -132,7 +132,7 @@ public class MinecraftChatListener implements Listener {
             WebhookClient client = new WebhookClientBuilder(DiscordSync.hook.getUrl()).build();
             WebhookMessageBuilder msg = new WebhookMessageBuilder();
             WebhookEmbedBuilder web = new WebhookEmbedBuilder();
-            web.setTitle(new WebhookEmbed.EmbedTitle(e.getAffected().getName() + (e.getValue() ? " is now AFK" : "is no longer AFK"), null));
+            web.setTitle(new WebhookEmbed.EmbedTitle(e.getAffected().getName() + (e.getValue() ? " is now AFK" : " is no longer AFK"), null));
             web.setColor(Color.BLACK.getRGB());
             msg.setAvatarUrl(avatarURL);
             msg.setUsername(Settings.GLOBAL_MESSAGE_USERNAME);
